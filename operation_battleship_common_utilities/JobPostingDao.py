@@ -355,9 +355,10 @@ class JobPostingDao:
             conn.close()
             return None
         
-    def getCurrentJobsIdsAsDataFrame(self):
+    def getActiveJobsIdsAsDataFrame(self):
         """
-        This fuction calls the Job Posting Table to find all the records and returns them to the user as a pandas pd 
+        This fuction calls the Job Posting Table to find all the records where active = true 
+        and returns them to the user as a pandas pd 
         """
         conn = psycopg2.connect(
             host=os.getenv("host"),
@@ -369,7 +370,7 @@ class JobPostingDao:
         try:
             cur = conn.cursor()
             
-            cur.execute("SELECT posting_url FROM job_postings")
+            cur.execute("SELECT * FROM job_postings where job_active = true")
 
             rows = cur.fetchall()
 
@@ -382,9 +383,42 @@ class JobPostingDao:
 
         except Exception as e:
             logging.error("Database connection error:", e)
-            logging.error(f"Database error in JobPosting.getCurrentJobsIdsAsDataFrame. ")  
+            logging.error(f"Database error in JobPosting.getActiveJobsIdsAsDataFrame. ")  
             conn.close()
             return None
+    
+    def getJobByJobPostingId(self, job_posting_id):
+        """
+        This fuction calls the Job Posting Table to find the record by a given job_posting_id and returns it as a pandas pd 
+        """
+        conn = psycopg2.connect(
+            host=os.getenv("host"),
+            database=os.getenv("database"),
+            user=os.getenv("digitalOcean"),
+            password=os.getenv("password"),
+            port=os.getenv("port")
+            )
+        try:
+            cur = conn.cursor()
+            
+            sql_command = "SELECT * FROM job_postings where job_posting_id = %s"
+            cur.execute(sql_command, (job_posting_id, ))
+
+            rows = cur.fetchall()
+
+            df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
+
+            cur.close()
+            conn.close()
+
+            return df
+
+        except Exception as e:
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getJobByJobPostingId. ")  
+            conn.close()
+            return None
+
     
     def getProductManagerJobs(self):
 

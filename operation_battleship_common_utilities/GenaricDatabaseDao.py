@@ -22,9 +22,32 @@ class GenaricDatabaseDao:
     def __init__(self):
         logging.info(f"{self.__class__.__name__} class initialized")
 
-    def execute_select_command(sql_statement):
+    def execute_select_command(self, sql_statement):
+        conn = psycopg2.connect(
+            host=os.getenv("host"),
+            database=os.getenv("database"),
+            user=os.getenv("digitalOcean"),
+            password=os.getenv("password"),
+            port=os.getenv("port")
+            )
+        try:
+            cur = conn.cursor()
+            
+            cur.execute(sql_statement)
 
-        return
+            rows = cur.fetchall()
+
+            df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
+
+            cur.close()
+            conn.close()
+
+            return df
+
+        except Exception as e:
+            logging.error("Database error:", e)
+            conn.close()
+            return None
     
     def execute_update_command(sql_statement, data):
 
