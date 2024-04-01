@@ -10,6 +10,7 @@ This script uses environment variables for sensitive data like the Apify token, 
 """
 
 import os
+
 import json
 import logging
 import random

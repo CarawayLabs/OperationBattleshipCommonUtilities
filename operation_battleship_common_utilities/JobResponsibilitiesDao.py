@@ -8,9 +8,7 @@ import psycopg2
 
 load_dotenv('.env')
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 
 class JobResponsibilitiesDao :
     def __init__(self):
@@ -30,13 +28,10 @@ class JobResponsibilitiesDao :
             port=os.getenv("port")
         )
         try:
-            # Create a new cursor
             cur = conn.cursor()
 
-            # Prepare the SQL insert statement
             sql_insert_query = "INSERT INTO Job_Responsibilities (job_posting_id, unique_id, item) VALUES (%s, %s, %s)"
 
-            # Loop through each row in the DataFrame and insert it into the database
             for index, row in jobResponsibilitiesDataFrame.iterrows():
 
                 # Convert UUID to string before insertion
@@ -45,18 +40,14 @@ class JobResponsibilitiesDao :
                 data = (job_posting_id_str, unique_id_str, row['item'])
                 cur.execute(sql_insert_query, data)
                 
-            # Commit the transaction
             conn.commit()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return success or some form of acknowledgment
             return "Update successful!"
 
         except Exception as e:
-            print("Database connection error:", e)
-            # Ensure connection is closed even if error occurs
+            logging.error("Database connection error:", e)
             conn.close()
             return None

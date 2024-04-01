@@ -40,39 +40,33 @@ class CompanyDao:
     """
     def getCompanyUuidByLinkedInUrl(self, companyLinkedinUrl):
         try:
-            # Establish a connection to the database
+            
             conn = psycopg2.connect(
                 host=os.getenv("host"),
                 database=os.getenv("database"),
-                user=os.getenv("digitalOcean"),  # Ensure correct environment variable name
+                user=os.getenv("digitalOcean"),  
                 password=os.getenv("password"),
                 port=os.getenv("port")
             )
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query with parameterized input
             cur.execute("SELECT company_id FROM Companies WHERE linkedin_url = %s", (companyLinkedinUrl,))
             
-            # Fetch all the rows
             rows = cur.fetchall()
             
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Check the number of rows returned and return the company_id
             if rows:
-                return rows[0][0]  # Assuming there's always one unique ID per LinkedIn URL
+                return rows[0][0]  
             else:
-                logging.info(f"Error in getting Company ID. We always expect an ID in this function. Failed for: {companyLinkedinUrl} ")
-                return None  # Or appropriate error handling/message
+                logging.error(f"Error in getting Company ID. We always expect an ID in this function. Failed for: {companyLinkedinUrl} ")
+                return None  
 
         except Exception as e:
-            # Log or print the error for debugging
-            print("Database connection error:", e)
-            logging.info(f"Database error in CompanyDao.getCompanyUuidByLinkedInUrl for Company at: {companyLinkedinUrl} ")
-            # Close the connection in case of error
+            
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in CompanyDao.getCompanyUuidByLinkedInUrl for Company at: {companyLinkedinUrl} ")
             if 'conn' in locals():
                 conn.close()
             return None
@@ -83,7 +77,6 @@ class CompanyDao:
     """
     def doesCompanyExist(self, linkedInCompanyUrl):
         
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -92,35 +85,30 @@ class CompanyDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
+
             cur = conn.cursor()
             
-            # Execute the SQL query with parameterized input
             cur.execute("SELECT * FROM companies WHERE linkedin_url = %s", (linkedInCompanyUrl, ))    
             
-            # Fetch all the rows
             rows = cur.fetchall()
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Check the number of rows returned and return True or False
             return len(rows) > 0
 
         except Exception as e:
-            # Log or print the error for debugging
-            print("Database connection error:", e)
-            logging.info(f"Database error in CompanyDao.doesCompanyExist for Company at: {linkedInCompanyUrl} ")           
-            # Close the connection in case of error
+            
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in CompanyDao.doesCompanyExist for Company at: {linkedInCompanyUrl} ")           
+            
             if 'conn' in locals():
                 conn.close()
-            return False  # You might want to return False or re-raise the exception depending on your use case
+            return False  
     
 
     def insertCompany(self, companyDataFrame):
         conn = None
         try:
-            # Establish a connection to the database
             conn = psycopg2.connect(
                 host=os.getenv("host"),
                 database=os.getenv("database"),
@@ -128,10 +116,8 @@ class CompanyDao:
                 password=os.getenv("password"),
                 port=os.getenv("port")
             )
-            # Create a new cursor
             cur = conn.cursor()
 
-            # SQL statement for inserting data
             insert_sql = """
             INSERT INTO Companies (
                 company_id, company_name, company_website, linkedin_url, industry, 
@@ -141,22 +127,57 @@ class CompanyDao:
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
 
-            # Assuming there's only one row in the DataFrame, access the first row directly
             row = companyDataFrame.iloc[0].apply(lambda x: str(x) if isinstance(x, uuid.UUID) else x)
             cur.execute(insert_sql, tuple(row))
 
-            # Commit the changes
             conn.commit()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
+            return
+
         except Exception as e:
-            # Log or print the error for debugging
-            print("Database connection error:", e)
-            logging.info(f"Database error in CompanyDao.insertCompany for Company at: {companyDataFrame["company_name"]} ")  
-            # Close the connection in case of error
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in CompanyDao.insertCompany for Company at: {companyDataFrame["company_name"]} ")  
             if conn:
                 conn.close()
+            return
+        
+    def getCompanyNameByCompanyId(self, company_id):
+
+        try:
+
+            conn = psycopg2.connect(
+                host=os.getenv("host"),
+                database=os.getenv("database"),
+                user=os.getenv("digitalOcean"),  
+                password=os.getenv("password"),
+                port=os.getenv("port")
+            )
+            
+            cur = conn.cursor()
+            
+            cur.execute("SELECT company_name FROM Companies WHERE company_id = %s", (company_id,))
+            
+            rows = cur.fetchall()
+            
+            cur.close()
+            conn.close()
+
+            if rows:
+                return rows[0][0]  
+            else:
+                logging.info(f"Error in getting Company Name. We always expect an name in this function. Failed for company id: {company_id} ")
+                return None  
+
+        except Exception as e:
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in CompanyDao.getCompanyNameByCompanyId for Company at: {company_id} ")
+            
+            if 'conn' in locals():
+                conn.close()
+            return None
+
+
     

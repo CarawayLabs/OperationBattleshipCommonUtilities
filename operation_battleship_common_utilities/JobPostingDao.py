@@ -8,7 +8,6 @@ import psycopg2
 
 load_dotenv('.env')
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -35,40 +34,30 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings WHERE job_category IN ('Product_Management', 'Data_Science')")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getAllDataScienceOrProductCategorizedJobs(). ")  
             conn.close()
         return
 
-
-        return 
-    
     def getAllProductManagerJobs(self):
         """
         This fuction calls the Job Posting Table to find all the records that contain either AI or Product Manager in the title.  
     
         """
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -77,28 +66,21 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
-            
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings WHERE (job_title ILIKE '%AI%' OR job_title ILIKE '%Product Manager%')")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getAllProductManagerJobs. ")  
             conn.close()
         return
     
@@ -115,7 +97,6 @@ class JobPostingDao:
             port=os.getenv("port")
         )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
             # Code to construct a SQL query from the job_posting dataframe
@@ -125,25 +106,20 @@ class JobPostingDao:
             SET job_last_collected_date = %s
             WHERE posting_url = %s;
             """
-            # Prepare data tuple to be updated
             todaysDate = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).strftime('%Y-%m-%d %H:%M:%S'), 
             data = (todaysDate, jobUrl)
             
-            # Execute the SQL query
             cur.execute(sql_update_query, data)
             
-            # Commit the transaction
             conn.commit()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return success or some form of acknowledgment
             return "Update successful!"
 
         except Exception as e:
-            print("Database connection error:", e)
+            logging.error("Database connection error:", e)
             conn.close()
             return None
     
@@ -193,7 +169,7 @@ class JobPostingDao:
                 logging.error("Error formatting SQL: %s", mogrify_error)
 
         finally:
-            # Close the connection if it's open
+            
             if conn is not None:
                 conn.close()
 
@@ -203,7 +179,6 @@ class JobPostingDao:
         This fuction calls the Job Posting Table to find all the PM records that need further enrichment. 
         This process adds salary details, AI Details and basic job description info. 
         """
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -212,28 +187,22 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings WHERE (job_title ILIKE '%AI%' OR job_title ILIKE '%Product Manager%') AND is_ai IS NULL order by job_posting_date desc;")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
             conn.close()
             return None
 
@@ -243,7 +212,6 @@ class JobPostingDao:
         This fuction calls the Job Posting Table to find all the records that need further enrichment. 
         This process adds salary details, AI Details and basic job description info. 
         """
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -252,80 +220,64 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings WHERE is_ai IS NULL")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
-
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.fetchJobsRequiringEnrichment(). ")  
             conn.close()
             return None
     
     def checkIfJobExists(self, cleanedLinkedInJobURL):
         try:
-            # Establish a connection to the database
             conn = psycopg2.connect(
                 host=os.getenv("host"),
                 database=os.getenv("database"),
-                user=os.getenv("digitalOcean"),  # Assuming this is the correct env variable name
+                user=os.getenv("digitalOcean"),  
                 password=os.getenv("password"),
                 port=os.getenv("port")
             )
-            # Create a new cursor
             cur = conn.cursor()
 
-            # Prepare the SQL command
             sql_command = "SELECT * FROM job_postings WHERE posting_url = %s"
             
-            
-
-            # Execute the SQL command
             cur.execute(sql_command, (cleanedLinkedInJobURL, ))
             
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Check the number of rows returned and return True or False
             return len(rows) > 0
 
         except Exception as e:
-            # Log or print the error for debugging
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.checkIfJobExists for Job at: {cleanedLinkedInJobURL} ")  
+            
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.checkIfJobExists for Job at: {cleanedLinkedInJobURL} ")  
             
             mogrified_query = cur.mogrify(sql_command, (cleanedLinkedInJobURL, )).decode('utf-8')
-            logging.info(f"Executing SQL command: {mogrified_query}")
-            # Close the connection in case of error
+            logging.error(f"Error occurred while Executing SQL command: {mogrified_query}")
+           
             if 'conn' in locals():
                 conn.close()
-            return False  # You might want to return False or re-raise the exception depending on your use case
+            return False  
         
 
     def insertNewJobRecord(self, jobpostingDataFrame):
 
         conn = None
         try:
-            # Establish a connection to the database
+           
             conn = psycopg2.connect(
                 host=os.getenv("host"),
                 database=os.getenv("database"),
@@ -333,7 +285,7 @@ class JobPostingDao:
                 password=os.getenv("password"),
                 port=os.getenv("port")
             )
-            # Create a new cursor
+           
             cur = conn.cursor()
 
             # SQL statement for inserting data
@@ -362,10 +314,10 @@ class JobPostingDao:
         except Exception as e:
             # Log or print the error for debugging
 
-            logging.info(f"Database error: {e}")
-            logging.info(f"Database error in JobPosting.insertNewJobRecord for Job at: {jobpostingDataFrame["posting_url"]} ")
-            logging.info(f"Executing SQL: {insert_sql} with data: {tuple(row)}")  
-            # Close the connection in case of error
+            logging.error(f"Database error: {e}")
+            logging.error(f"Database error in JobPosting.insertNewJobRecord for Job at: {jobpostingDataFrame["posting_url"]} ")
+            logging.error(f"Executing SQL: {insert_sql} with data: {tuple(row)}")  
+            
             if conn:
                 conn.close() 
             
@@ -375,7 +327,7 @@ class JobPostingDao:
         """
         This fuction calls the Job Posting Table to find all the records and returns them to the user as a pandas pd 
         """
-        # Establish a connection to the database
+        
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -384,28 +336,22 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
             conn.close()
             return None
         
@@ -413,7 +359,6 @@ class JobPostingDao:
         """
         This fuction calls the Job Posting Table to find all the records and returns them to the user as a pandas pd 
         """
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -422,28 +367,22 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT posting_url FROM job_postings")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getCurrentJobsIdsAsDataFrame. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getCurrentJobsIdsAsDataFrame. ")  
             conn.close()
             return None
     
@@ -457,7 +396,6 @@ class JobPostingDao:
         This fuction calls the Job Posting Table to find all the PM records that need further enrichment. 
         This process adds salary details, AI Details and basic job description info. 
         """
-        # Establish a connection to the database
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -466,33 +404,26 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
             
-            # Execute the SQL query. We know that the is_ai column will be null when the data is raw. 
             cur.execute("SELECT * FROM job_postings WHERE job_category is null;")
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return the DataFrame
+
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
-            logging.info(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
+            logging.error("Database connection error:", e)
+            logging.error(f"Database error in JobPosting.getUnprocessedAiClassificationJobs. ")  
             conn.close()
             return None
 
-
-        return
     
     def getjobsFromListOfJobsIds(self, dataframeOfJobIds):
         """
@@ -506,10 +437,8 @@ class JobPostingDao:
         """
         job_ids = dataframeOfJobIds['job_posting_id'].tolist()
 
-        # Convert list of job_ids to tuple for SQL query
         job_ids_tuple = tuple(job_ids)
 
-        # SQL query
         sql_query = f"""
         SELECT
             c.company_name,
@@ -545,7 +474,7 @@ class JobPostingDao:
         WHERE
             jp.job_posting_id IN %s;
         """
-        # Establish a connection to the database
+        
         conn = psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
@@ -554,28 +483,23 @@ class JobPostingDao:
             port=os.getenv("port")
             )
         try:
-            # Create a new cursor
             cur = conn.cursor()
 
-            # Execute the SQL query with parameterized input for safety
             cur.execute(sql_query, (job_ids_tuple,))
 
-            # Fetch all the rows
             rows = cur.fetchall()
 
-            # Convert the results into a pandas DataFrame
             if rows:
                 df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
             else:
                 df = pd.DataFrame()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
             return df
 
         except Exception as e:
-            print("Database connection error:", e)
+            logging.error("Database connection error:", e)
             conn.close()
             return pd.DataFrame()

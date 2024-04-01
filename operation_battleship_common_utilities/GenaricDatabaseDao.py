@@ -1,6 +1,8 @@
 """
 This script is intended to be the only class that actually calls the PostGres DB. All other DAO Classes will reference this Class. 
 
+TODO: Implement this class and update other scripts to call this instead. 
+
 """
 
 import os
@@ -13,7 +15,7 @@ import psycopg2
 
 load_dotenv('.env')
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class GenaricDatabaseDao:

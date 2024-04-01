@@ -7,7 +7,7 @@ import re
 import pandas as pd
 
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class GeographyHelper :
@@ -17,7 +17,7 @@ class GeographyHelper :
 
     def getCityState(self, cityStateString):
 
-            # Regular expression to match the patterns "City, State" or "State, Country"
+        # Regular expression to match the patterns "City, State" or "State, Country"
         pattern = re.compile(r"([A-Za-z\s\-]+)(?:, )?([A-Z]{2})?")
 
         # Apply the pattern to the string

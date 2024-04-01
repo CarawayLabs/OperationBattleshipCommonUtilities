@@ -11,7 +11,7 @@ import psycopg2
 
 load_dotenv('.env')
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class JobKeyWordsDao :
@@ -32,13 +32,10 @@ class JobKeyWordsDao :
             port=os.getenv("port")
         )
         try:
-            # Create a new cursor
             cur = conn.cursor()
 
-            # Prepare the SQL insert statement
             sql_insert_query = "INSERT INTO Job_Keywords (job_posting_id, unique_id, item) VALUES (%s, %s, %s)"
 
-            # Loop through each row in the DataFrame and insert it into the database
             for index, row in jobKeyWordsDataFrame.iterrows():
 
                 # Convert UUID to string before insertion
@@ -47,19 +44,56 @@ class JobKeyWordsDao :
                 data = (job_posting_id_str, unique_id_str, row['item'])
                 cur.execute(sql_insert_query, data)
                 
-            # Commit the transaction
-
+            
             conn.commit()
 
-            # Close the cursor and connection
             cur.close()
             conn.close()
 
-            # Return success or some form of acknowledgment
             return "Update successful!"
 
         except Exception as e:
-            print("Database connection error:", e)
-            # Ensure connection is closed even if error occurs
+            logging.error("Database connection error:", e)
             conn.close()
             return None
+        
+
+
+    def getKeywordsForJobID(self, job_posting_id):
+
+        """
+        This function calls the Job Keywords Table to find all the records that have the given job_posting_id 
+        
+        Returns the list as a Pandas DataFrame
+        """
+
+        conn = psycopg2.connect(
+            host=os.getenv("host"),
+            database=os.getenv("database"),
+            user=os.getenv("digitalOcean"),
+            password=os.getenv("password"),
+            port=os.getenv("port")
+        )
+        try:
+
+            cur = conn.cursor()
+            
+            sql_select_query = "SELECT * FROM job_keywords WHERE job_posting_id = %s"
+            cur.execute(sql_select_query, (job_posting_id,))  
+
+            rows = cur.fetchall()
+
+            if rows:
+                df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
+            else:
+                df = pd.DataFrame()
+
+            cur.close()
+            conn.close()
+
+            return df
+
+        except Exception as e:
+            logging.error(f"Database connection error in getSkillsForJobID: {e}")
+            conn.close()
+            return pd.DataFrame()  
