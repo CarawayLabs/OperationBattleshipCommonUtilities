@@ -476,6 +476,7 @@ class JobPostingDao:
         sql_query = f"""
         SELECT
             c.company_name,
+            c.linkedin_url,
             jp.job_title,
             jp.posting_url,
             jp.full_posting_description,
