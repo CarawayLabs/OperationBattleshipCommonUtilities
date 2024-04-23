@@ -315,7 +315,7 @@ class JobPostingDao:
             # Log or print the error for debugging
 
             logging.error(f"Database error: {e}")
-            logging.error(f"Database error in JobPosting.insertNewJobRecord for Job at: {jobpostingDataFrame["posting_url"]} ")
+            logging.error(f"Database error in JobPosting.insertNewJobRecord for Job at: {jobpostingDataFrame['posting_url']} ")
             logging.error(f"Executing SQL: {insert_sql} with data: {tuple(row)}")  
             
             if conn:
