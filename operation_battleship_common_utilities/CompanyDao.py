@@ -168,7 +168,7 @@ class CompanyDao:
             if rows:
                 return rows[0][0]  
             else:
-                logging.info(f"Error in getting Company Name. We always expect an name in this function. Failed for company id: {company_id} ")
+                logging.error(f"Error in getting Company Name. We always expect an name in this function. Failed for company id: {company_id} ")
                 return None  
 
         except Exception as e:

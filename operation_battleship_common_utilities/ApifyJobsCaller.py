@@ -20,11 +20,11 @@ from dotenv import load_dotenv
 from apify_client import ApifyClient
 
 
+load_dotenv('.env')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-load_dotenv('.env')
 
 class ApifyJobsCaller:
     def __init__(self):
@@ -36,7 +36,7 @@ class ApifyJobsCaller:
     #This function will call the Apify Python SDK and run the job. It requires a job title. 
     #The expectation is that this is the only function that actually calls the API SDK. 
     def execute_new_jobs_crawler(self, job_title_name, duration):
-        logging.info(f"Beginning the process for collecting {job_title_name} jobs from Apify Job Crawler")
+        logging.info(f"Beginning the process for collecting {job_title_name} jobs from Apify Job Crawlerin")
 
         apifytokenFromEnv = os.getenv("APIFY_CLIENT_TOKEN")  # Ensure correct environment variable name
         client = ApifyClient(apifytokenFromEnv)
