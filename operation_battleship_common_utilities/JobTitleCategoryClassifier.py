@@ -31,8 +31,9 @@ logging.basicConfig(level=logging.INFO)
 
 class JobTitleCategoryClassifier:
     def __init__(self):
-
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.basicConfig(level=logging.INFO)  # Ensure logger is set up
+        self.logger = logging.getLogger(__name__)  # Get a logger for this class
+        self.logger.info(f"{self.__class__.__name__} class initialized")
         self.data_frame = pd.read_csv('CommonUtilities/Configuration/JobCategories.csv')
         
 

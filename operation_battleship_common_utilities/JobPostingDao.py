@@ -35,7 +35,7 @@ class JobPostingDao:
                 result = "Success"
             cur.close()
         except Exception as e:
-            logging.error("Database error:", e)
+            logging.error(f"Database error: {e}\nSQL Statement: {sql_statement}\nData: {data}")
             result = None
         finally:
             conn.close()
