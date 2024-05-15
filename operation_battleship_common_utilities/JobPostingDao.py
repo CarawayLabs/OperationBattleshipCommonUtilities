@@ -74,8 +74,13 @@ class JobPostingDao:
         return self.execute_db_command(sql)
 
     def fetchJobsRequiringEnrichment(self):
-        sql = "SELECT * FROM job_postings WHERE is_ai IS NULL"
+        sql = """
+        SELECT * FROM job_postings 
+        WHERE is_ai IS NULL 
+        AND date >= CURRENT_DATE - INTERVAL '30 days'
+        """
         return self.execute_db_command(sql)
+
 
     def checkIfJobExists(self, cleanedLinkedInJobURL):
         sql = "SELECT * FROM job_postings WHERE posting_url = %s"
