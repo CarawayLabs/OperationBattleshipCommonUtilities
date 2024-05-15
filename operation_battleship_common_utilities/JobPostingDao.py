@@ -95,8 +95,14 @@ class JobPostingDao:
             job_posting_date, job_insertion_date, job_last_collected_date, job_active, city, state
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        row = jobpostingDataFrame.iloc[0].apply(lambda x: str(x) if isinstance(x, uuid.UUID) else x)
-        return self.execute_db_command(sql, tuple(row))
+        # Extract the first row from the DataFrame as a dictionary
+        row_dict = jobpostingDataFrame.iloc[0].to_dict()
+        
+        # Convert the dictionary values to a tuple
+        row = tuple(row_dict.values())
+        
+        return self.execute_db_command(sql, row)
+
 
     def getAllJobs(self):
         sql = "SELECT * FROM job_postings"
