@@ -52,9 +52,11 @@ class CompanyDao:
     def getCompanyUuidByLinkedInUrl(self, companyLinkedinUrl):
         sql = "SELECT company_id FROM companies WHERE linkedin_url = %s"
         result = self.execute_db_command(sql, (companyLinkedinUrl,))
-        if result:
-            return result[0][0]
+        
+        if not result.empty:
+            return result.iloc[0, 0]
         return None
+
 
     def doesCompanyExist(self, linkedInCompanyUrl):
         sql = "SELECT 1 FROM companies WHERE linkedin_url = %s"
