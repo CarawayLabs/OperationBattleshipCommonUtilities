@@ -77,7 +77,7 @@ class JobPostingDao:
         sql = """
         SELECT * FROM job_postings 
         WHERE is_ai IS NULL 
-        AND date >= CURRENT_DATE - INTERVAL '30 days'
+        AND job_posting_date >= CURRENT_DATE - INTERVAL '30 days'
         """
         return self.execute_db_command(sql)
 
