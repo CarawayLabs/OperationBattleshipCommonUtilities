@@ -8,7 +8,7 @@ load_dotenv('.env')
 class OpenAICaller:
     def __init__(self):
         
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
 
     #We can toggle between the two models. 3.5T and 4T
     # gpt-4-turbo-preview

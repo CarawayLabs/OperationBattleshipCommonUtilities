@@ -15,7 +15,7 @@ load_dotenv('.env')
 
 class FailureLogger:
     def __init__(self):
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
         self.base_failure_dir = 'llmFailures'
         # Ensure the base directory exists
         if not os.path.exists(self.base_failure_dir):

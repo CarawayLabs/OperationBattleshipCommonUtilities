@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class JobPostingDao:
     def __init__(self):
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
 
     def _get_connection(self):
         return psycopg2.connect(

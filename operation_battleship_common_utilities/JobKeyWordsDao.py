@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class JobKeyWordsDao :
     def __init__(self):
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
 
 
     def insertJobKeyWordsForJobPosting(self, jobKeyWordsDataFrame):

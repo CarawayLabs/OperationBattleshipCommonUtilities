@@ -11,7 +11,7 @@ class PineConeDatabaseCaller:
 
     def __init__(self, api_key):
         self.pc = Pinecone(api_key=api_key)  # Initialize Pinecone client with your API key
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
 
         return
     

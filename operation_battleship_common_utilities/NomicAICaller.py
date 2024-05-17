@@ -10,7 +10,7 @@ load_dotenv('.env')
 class NomicAICaller:
     def __init__(self):
         
-        logging.info(f"{self.__class__.__name__} class initialized")
+        logging.debug(f"{self.__class__.__name__} class initialized")
 
 
 
