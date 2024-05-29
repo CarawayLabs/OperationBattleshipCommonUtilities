@@ -27,7 +27,7 @@ class NomicDao:
         return psycopg2.connect(
             host=os.getenv("host"),
             database=os.getenv("database"),
-            user=os.getenv("user"),
+            user=os.getenv("digitalOcean"),
             password=os.getenv("password"),
             port=os.getenv("port")
         )
