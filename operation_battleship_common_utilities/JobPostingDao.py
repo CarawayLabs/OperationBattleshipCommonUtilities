@@ -46,7 +46,7 @@ class JobPostingDao:
         return self.execute_db_command(sql)
 
     def getAllProductManagerJobs(self):
-        sql = "SELECT * FROM job_postings WHERE (job_title ILIKE '%AI%' OR job_title ILIKE '%Product Manager%')"
+        sql = "SELECT * FROM job_postings WHERE job_category = 'Product_Management'"
         return self.execute_db_command(sql)
 
     def updateLinkedInJobRecordUpdatedDate(self, jobUrl):

@@ -13,8 +13,9 @@ class OpenAICaller:
     #We can toggle between the two models. 3.5T and 4T
     # gpt-4-turbo-preview
     # gpt-3.5-turbo-16k
+    # gpt-4o-mini
         
-    def get_completion(self, prompt, model="gpt-3.5-turbo-16k"):
+    def get_completion(self, prompt, model="gpt-4o-mini"):
         # gets API Key from environment variable OPENAI_API_KEY
         client = OpenAI()
 
